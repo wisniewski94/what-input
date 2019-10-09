@@ -249,7 +249,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // fail silently
 	      }
 	    }
-
 	    // always run these so at least `initial` state is set
 	    doUpdate('input');
 	    doUpdate('intent');
@@ -274,12 +273,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (validateTouch(value)) {
 	      shouldUpdate = false;
 	    }
+	    doUpdate('input', event.target);
 
 	    if (shouldUpdate && currentInput !== value) {
 	      currentInput = value;
 
-	      persistInput('input', currentInput);
-	      doUpdate('input');
+	      persistInput('input', event.target);
+	      doUpdate('input', event.target);
 	    }
 
 	    if (shouldUpdate && currentIntent !== value) {
@@ -291,14 +291,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        currentIntent = value;
 
 	        persistInput('intent', currentIntent);
-	        doUpdate('intent');
+	        doUpdate('intent', event.target);
 	      }
 	    }
 	  };
 
 	  // updates the doc and `inputTypes` array with new input
-	  var doUpdate = function doUpdate(which) {
+	  var doUpdate = function doUpdate(which, target) {
+	    console.log(which, target);
 	    docElem.setAttribute('data-what' + which, which === 'input' ? currentInput : currentIntent);
+	    if (target !== undefined) {
+	      console.log('SET', currentInput, currentIntent, which);
+	      target.setAttribute('data-what' + which, which === 'input' ? currentInput : currentIntent);
+	    }
 
 	    fireFunctions(which);
 	  };
@@ -317,7 +322,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // only execute if scrolling isn't happening
 	    if ((!isScrolling && !validateTouch(value) || isScrolling && event.type === 'wheel' || event.type === 'mousewheel' || event.type === 'DOMMouseScroll') && currentIntent !== value) {
 	      currentIntent = value;
-
 	      persistInput('intent', currentIntent);
 	      doUpdate('intent');
 	    }

@@ -188,7 +188,6 @@ module.exports = (() => {
         // fail silently
       }
     }
-
     // always run these so at least `initial` state is set
     doUpdate('input')
     doUpdate('intent')
@@ -218,12 +217,13 @@ module.exports = (() => {
     if (validateTouch(value)) {
       shouldUpdate = false
     }
+    doUpdate('input', event.target)
 
     if (shouldUpdate && currentInput !== value) {
       currentInput = value
 
-      persistInput('input', currentInput)
-      doUpdate('input')
+      persistInput('input', event.target)
+      doUpdate('input', event.target)
     }
 
     if (shouldUpdate && currentIntent !== value) {
@@ -240,17 +240,25 @@ module.exports = (() => {
         currentIntent = value
 
         persistInput('intent', currentIntent)
-        doUpdate('intent')
+        doUpdate('intent', event.target)
       }
     }
   }
 
   // updates the doc and `inputTypes` array with new input
-  const doUpdate = which => {
+  const doUpdate = (which, target) => {
+    console.log(which, target)
     docElem.setAttribute(
       'data-what' + which,
       which === 'input' ? currentInput : currentIntent
     )
+    if (target !== undefined) {
+      console.log('SET', currentInput, currentIntent, which)
+      target.setAttribute(
+        'data-what' + which,
+        which === 'input' ? currentInput : currentIntent
+      )
+    }
 
     fireFunctions(which)
   }
@@ -275,7 +283,6 @@ module.exports = (() => {
       currentIntent !== value
     ) {
       currentIntent = value
-
       persistInput('intent', currentIntent)
       doUpdate('intent')
     }
